@@ -1,6 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { AsyncValidator, AbstractControl, ValidationErrors } from '@angular/forms';
+
 import { Observable, map, catchError, of } from 'rxjs';
+
 import { CityService } from '../../services/city.service';
 
 @Injectable({ providedIn: 'root' })

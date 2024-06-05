@@ -1,10 +1,14 @@
 import { Injectable, inject } from '@angular/core';
+
+import { Observable, catchError, filter, forkJoin, map, of, switchMap, tap } from 'rxjs';
+
 import { DataService } from './data-store';
-import { CityWeather, DailyWeatherDTO, HourlyWeatherDTO, SingleHourWeather } from '../interfaces/weather.interface';
-import { Observable, catchError, filter, first, forkJoin, map, of, switchMap, take, tap, throwError } from 'rxjs';
 import { CityService } from '../services/city.service';
 import { WeatherService } from '../services/weather.service';
+
 import { dailyWeatherMapping, hourlyWeatherMapping } from '../utils/weather-mapping';
+
+import { CityWeather, DailyWeatherDTO, HourlyWeatherDTO } from '../interfaces/weather.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -18,31 +22,25 @@ export class WeatherDataService extends DataService<CityWeather> {
       return;
     } else {
       this.getCityWeather(city)
-        .pipe(tap((data) => this.setState(city, data)))
+        .pipe(tap((data) => this.setState(data.city, data)))
         .subscribe();
     }
   }
 
-  getCityWeather(city: string): Observable<CityWeather> {
+  public getCityWeather(city: string): Observable<CityWeather> {
     const cityWeather: Observable<CityWeather> = this.cityServ.getCity(city).pipe(
       filter((cities) => !!cities.length),
       catchError((e) => of(e)),
-      take(1),
       map((cities) => cities[0]),
-      switchMap(({ lat, lon }) => {
+      switchMap(({ name, lat, lon }) => {
         const hourly = this.weatherServ.getWeather(lat, lon, 'daily') as Observable<HourlyWeatherDTO>;
         const daily = this.weatherServ.getWeather(lat, lon, 'hourly') as Observable<DailyWeatherDTO>;
-        return forkJoin([hourly, daily]);
+        return forkJoin([of(name), hourly, daily]);
       }),
-      map(([hourlyData, dailyData]) => {
+      map(([name, hourlyData, dailyData]) => {
         const hourly = hourlyWeatherMapping(hourlyData);
         const daily = dailyWeatherMapping(dailyData);
-
-        return {
-          city,
-          daily,
-          hourly,
-        };
+        return { city: name, daily, hourly };
       })
     );
     return cityWeather;

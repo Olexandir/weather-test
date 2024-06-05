@@ -1,9 +1,11 @@
-import { Component, DestroyRef, inject } from '@angular/core';
-import { SEARCH_DEPS } from './search.deps';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
 import { IsCityValidator } from './is-city.validator';
 import { WeatherDataService } from '../../store/weather-store.service';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+import { SEARCH_DEPS } from './search.deps';
 
 type FormMap<T> = {
   [Property in keyof T]: FormControl<T[Property]>;
@@ -16,12 +18,13 @@ interface SearchForm {
   standalone: true,
   selector: 'app-search',
   templateUrl: './search.component.html',
-  styleUrl: './search.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: SEARCH_DEPS,
 })
 export class SearchComponent {
   private isCityValidator = inject(IsCityValidator);
   private weatherService = inject(WeatherDataService);
+  private chDetect = inject(ChangeDetectorRef);
 
   private readonly destroy: DestroyRef = inject(DestroyRef);
 
@@ -39,6 +42,7 @@ export class SearchComponent {
       if (status !== 'PENDING' && status === 'VALID') {
         this.searchForWeather();
       }
+      this.chDetect.detectChanges();
       return;
     });
   }

@@ -1,7 +1,10 @@
-import { environment } from '../../environments/environment';
-import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, first, map } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+
+import { Observable } from 'rxjs';
+
+import { environment } from '../../environments/environment';
+
 import { CityDTO } from '../interfaces/city.interface';
 
 @Injectable({
