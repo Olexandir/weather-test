@@ -4,12 +4,12 @@ import { CommonMaterialTableComponent } from '../abstracts/common-table.componen
 
 import { DailyDatasource, HourlyDatasource } from '../../interfaces/home.interface';
 
-import { DAILY_CITY_WEATHER_DEPS } from './daily-city-weather.deps';
+import { DAILY_CITY_WEATHER_DEPS } from './city-weather.deps';
 
 @Component({
   standalone: true,
-  selector: 'daily-city-weather',
-  templateUrl: './daily-city-weather.component.html',
+  selector: 'city-weather',
+  templateUrl: './city-weather.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: DAILY_CITY_WEATHER_DEPS,
 })

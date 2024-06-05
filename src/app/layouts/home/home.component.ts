@@ -1,4 +1,4 @@
-import { Component, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, inject } from '@angular/core';
 
 import { WeatherDataService } from '../../store/weather-store.service';
 
@@ -12,6 +12,7 @@ import { HOME_DEPS } from './home.deps';
 @Component({
   standalone: true,
   templateUrl: './home.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: HOME_DEPS,
 })
 export class HomeComponent {
@@ -22,12 +23,14 @@ export class HomeComponent {
   public reversePreset = this.preset === 'daily' ? 'hourly' : 'daily';
 
   private serv = inject(WeatherDataService);
+  private chDetect = inject(ChangeDetectorRef);
 
   constructor() {
     effect(() => {
       this.cities = this.serv.getState();
       this.setDataSources();
       this.toggleTableInfo();
+      this.chDetect.detectChanges();
     });
   }
 
