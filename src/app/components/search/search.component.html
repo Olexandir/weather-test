@@ -1,3 +1,9 @@
-<form>
-  <input />
+<form [formGroup]="searchForm" (ngSubmit)="onSubmit()">
+  <mat-form-field appearance="outline">
+    <input matInput formControlName="city" placeholder="City" />
+  </mat-form-field>
+
+  @if(searchForm.controls.city.errors?.['noCity']) {
+  <span> There is no such city {{ searchForm.controls.city.value }} </span>
+  }
 </form>

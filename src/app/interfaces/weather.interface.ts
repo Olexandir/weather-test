@@ -70,11 +70,6 @@ export interface CityWeather {
   hourly: SingleHourWeather[];
 }
 
-interface CommonWeather {
-  daily?: SingleDayWeather[];
-  hourly?: SingleHourWeather[];
-}
-
 export interface SingleHourWeather {
   hour: number;
   temperature: number;

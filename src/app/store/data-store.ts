@@ -4,8 +4,8 @@ import { Injectable, Signal, computed, signal } from '@angular/core';
 export abstract class DataService<T> {
   protected state = signal({} as { [key: string]: T });
 
-  public getState(): Signal<{ [key: string]: T }> {
-    return computed(() => this.state());
+  public getState(): { [key: string]: T } {
+    return computed(() => this.state())();
   }
 
   public setState(key: string, data: T): void {
