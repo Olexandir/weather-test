@@ -8,6 +8,7 @@ import { DailyDatasource, HourlyDatasource } from '../../interfaces/home.interfa
 import { dailyColumns, hourlyColumns } from './home.constants';
 
 import { HOME_DEPS } from './home.deps';
+import { ReloadService } from '../../services/reload.service';
 
 @Component({
   standalone: true,
@@ -19,11 +20,12 @@ export class HomeComponent {
   public cities: { [key: string]: CityWeather } | undefined;
   public data: DailyDatasource[] | HourlyDatasource[] = [];
   public columns: string[] = [];
-  public preset: 'daily' | 'hourly' = 'daily';
-  public reversePreset = this.preset === 'daily' ? 'hourly' : 'daily';
+  public preset: 'daily' | 'hourly' | string = '';
+  public reversePreset: 'daily' | 'hourly' | string = '';
 
   private serv = inject(WeatherDataService);
   private chDetect = inject(ChangeDetectorRef);
+  private reloadServ = inject(ReloadService);
 
   constructor() {
     effect(() => {
@@ -34,9 +36,29 @@ export class HomeComponent {
     });
   }
 
+  ngOnInit(): void {
+    this.setPreset();
+  }
+
+  private setPreset(): void {
+    const urlPreset = this.reloadServ.getParamFromUrl('periodicity');
+    if (urlPreset) {
+      this.preset = urlPreset;
+    } else {
+      this.preset = 'daily';
+      this.reloadServ.setParam(this.preset, 'periodicity');
+    }
+    this.setReversePreset();
+  }
+
+  private setReversePreset(): void {
+    this.reversePreset = this.preset === 'daily' ? 'hourly' : 'daily';
+  }
+
   public togglePreset(): void {
     this.preset = this.preset === 'daily' ? 'hourly' : 'daily';
-    this.reversePreset = this.preset === 'daily' ? 'hourly' : 'daily';
+    this.setReversePreset();
+    this.reloadServ.setParam(this.preset, 'periodicity');
     this.toggleTableInfo();
   }
 

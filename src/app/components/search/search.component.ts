@@ -6,6 +6,8 @@ import { IsCityValidator } from './is-city.validator';
 import { WeatherDataService } from '../../store/weather-store.service';
 
 import { SEARCH_DEPS } from './search.deps';
+import { ReloadService } from '../../services/reload.service';
+import { distinctUntilChanged, first } from 'rxjs';
 
 type FormMap<T> = {
   [Property in keyof T]: FormControl<T[Property]>;
@@ -24,9 +26,9 @@ interface SearchForm {
 export class SearchComponent {
   private isCityValidator = inject(IsCityValidator);
   private weatherService = inject(WeatherDataService);
+  private reloadServ = inject(ReloadService);
   private chDetect = inject(ChangeDetectorRef);
-
-  private readonly destroy: DestroyRef = inject(DestroyRef);
+  private destroy: DestroyRef = inject(DestroyRef);
 
   public searchForm = new FormGroup<FormMap<SearchForm>>({
     city: new FormControl('', {
@@ -37,8 +39,33 @@ export class SearchComponent {
     }),
   });
 
+  public cityControl = this.searchForm.controls.city;
+
+  ngOnInit(): void {
+    this.handleCityValueFromUrl();
+    this.handleFormValuesChange();
+  }
+
   public onSubmit(): void {
-    this.searchForm.statusChanges.pipe(takeUntilDestroyed(this.destroy)).subscribe((status) => {
+    this.handleFormStatusChange();
+  }
+
+  private handleCityValueFromUrl(): void {
+    const cityFromUrl = this.reloadServ.getParamFromUrl('city');
+    if (cityFromUrl) {
+      this.cityControl.setValue(cityFromUrl, { emitEvent: false });
+      this.searchForWeather();
+    }
+  }
+
+  private handleFormValuesChange(): void {
+    this.cityControl.valueChanges
+      .pipe(takeUntilDestroyed(this.destroy), distinctUntilChanged())
+      .subscribe((city) => this.reloadServ.setParam(city, 'city'));
+  }
+
+  private handleFormStatusChange(): void {
+    this.searchForm.statusChanges.pipe(first(), takeUntilDestroyed(this.destroy)).subscribe((status) => {
       if (status !== 'PENDING' && status === 'VALID') {
         this.searchForWeather();
       }
@@ -48,7 +75,7 @@ export class SearchComponent {
   }
 
   private searchForWeather(): void {
-    const city = this.searchForm.controls.city.value;
+    const city = this.cityControl.value;
     this.weatherService.loadData(city);
   }
 }

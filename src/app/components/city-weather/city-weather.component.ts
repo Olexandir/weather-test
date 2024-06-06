@@ -14,7 +14,7 @@ import { DAILY_CITY_WEATHER_DEPS } from './city-weather.deps';
   imports: DAILY_CITY_WEATHER_DEPS,
 })
 export class DailyCityWeatherComponent extends CommonMaterialTableComponent<DailyDatasource | HourlyDatasource> {
-  public periodicity = input.required<'daily' | 'hourly'>();
+  public periodicity = input.required<'daily' | 'hourly' | string>();
 
   public preiodicityValue: string;
 
