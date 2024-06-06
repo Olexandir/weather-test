@@ -7,20 +7,19 @@ import { filter, map } from 'rxjs';
 export class ReloadService {
   private actRoute = inject(ActivatedRoute);
   private router = inject(Router);
-  private destroyRef: DestroyRef = inject(DestroyRef);
 
-  setParams(city: string, preiodicity: string) {
+  public setParams(city: string, preiodicity: string): void {
     this.router.navigate([], { queryParams: { city, preiodicity } });
   }
 
-  setParam(param: string, paramName: 'periodicity' | 'city'): void {
+  public setParam(param: string, paramName: 'periodicity' | 'city'): void {
     const queryParams = { ...this.actRoute.snapshot.queryParams };
     queryParams[paramName] = param;
 
     this.router.navigate([], { queryParams });
   }
 
-  getParamFromUrl(param: 'periodicity' | 'city'): string {
+  public getParamFromUrl(param: 'periodicity' | 'city'): string {
     return this.actRoute.snapshot.queryParams[param];
   }
 }
