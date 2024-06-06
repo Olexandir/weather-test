@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, inject } from '@angular/core';
 
 import { WeatherDataService } from '../../store/weather-store.service';
+import { ReloadService } from '../../services/reload.service';
 
 import { CityWeather } from '../../interfaces/weather.interface';
 import { DailyDatasource, HourlyDatasource } from '../../interfaces/home.interface';
@@ -8,7 +9,6 @@ import { DailyDatasource, HourlyDatasource } from '../../interfaces/home.interfa
 import { dailyColumns, hourlyColumns } from './home.constants';
 
 import { HOME_DEPS } from './home.deps';
-import { ReloadService } from '../../services/reload.service';
 
 @Component({
   standalone: true,
